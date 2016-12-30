@@ -57,7 +57,7 @@ void Spacewar::initialize(HWND hwnd)	 {
 
 	Game::initialize(hwnd);
 
-	AllocConsole();		// Console for debugging
+	//AllocConsole();		// Console for debugging
 	freopen("conin$", "r", stdin);
 	freopen("conout$", "w", stdout);
 	freopen("conout$", "w", stderr);
@@ -436,12 +436,20 @@ void Spacewar::render() {
 								  if (currentWave != 1) {
 									  DrawEntities();
 									  ss.str("");
-									  ss << std::fixed << std::setprecision(1) << (float)(timeGetTime() - baseTime) / 1000;
+									  ss << std::fixed << std::setprecision(1) << (float)(timeGetTime() - baseTime) / 1000;				// time
 									  timeFont->Print(GAME_WIDTH / 2 - timeFont->getTotalWidth(ss.str()) / 2, 10, ss.str());
-									  ss.str("x" + std::to_string(combo));
+
+									  ss.str("x" + std::to_string(combo));																// combo
 									  comboFont->Print(10, GAME_HEIGHT - comboFont->getHeight() * comboFont->getScale(), ss.str());
-									  ss.str(std::to_string(playerScore));
-									  scoreFont->Print(10, 10, ss.str());
+
+									  ss.str("SCORE");																					// score label
+									  scoreFont->Print(10, 30, ss.str());
+									  ss.str(": " + std::to_string(playerScore));																	// player score
+									  scoreFont->Print(10 + scoreFont->getTotalWidth("HIGHSCORE"), 30, ss.str());
+
+									  ss.str("HIGHSCORE: " + std::to_string(highscore));													// latest highscore
+									  scoreFont->Print(10, 0, ss.str());
+									  
 									  for (std::vector<Entity*>::iterator iter = hearts.begin(); iter != hearts.end(); iter++) {
 										  (*iter)->draw();
 									  }
@@ -454,12 +462,21 @@ void Spacewar::render() {
 							  else {
 								  DrawEntities();
 								  ss.str("");
-								  ss << std::fixed << std::setprecision(1) << (float)(timeGetTime() - baseTime) / 1000;
+								  
+								  ss << std::fixed << std::setprecision(1) << (float)(timeGetTime() - baseTime) / 1000;					// time
 								  timeFont->Print(GAME_WIDTH / 2 - timeFont->getTotalWidth(ss.str()) / 2, 10, ss.str());
-								  ss.str("x" + std::to_string(combo));
+								  
+								  ss.str("x" + std::to_string(combo));																	// combo
 								  comboFont->Print(10, GAME_HEIGHT - comboFont->getHeight() * comboFont->getScale(), ss.str());
-								  ss.str(std::to_string(playerScore));
-								  scoreFont->Print(10, 10, ss.str());
+								  
+								  ss.str("SCORE");																						// score label
+								  scoreFont->Print(10, 30, ss.str());
+								  ss.str(": " + std::to_string(playerScore));															// player score
+								  scoreFont->Print(10 + scoreFont->getTotalWidth("HIGHSCORE"), 30, ss.str());
+
+								  ss.str("HIGHSCORE: " + std::to_string(highscore));													// latest highscore
+								  scoreFont->Print(10, 0, ss.str());
+
 								  for (std::vector<Entity*>::iterator iter = hearts.begin(); iter != hearts.end(); iter++) {
 									  (*iter)->draw();
 								  }
