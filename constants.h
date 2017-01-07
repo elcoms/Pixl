@@ -76,6 +76,22 @@ const float P_INVIN_SCALE				= 0.25f;						// player invin starting scale
 const float P_INVIN_ANIMATION_DELAY		= 0.1f;						// player invin animation time between frames
 const bool P_INVIN_LOOP					= true;						// Player invin animation loop
 
+// Effect Durations
+// Obstructors
+const float ENLARGE_DURATION = 5.0f;
+const float STUN_DURATION = 5.0f;
+const float SLOW_DURATION = 5.0f;
+const float INVERTED_DURATION = 5.0f;
+
+// Destructors
+const float FREEZE_DURATION = 5.0f;
+const float INVIN_DURATION = 5.0f;
+
+// Others
+const float INVUL_DURATION = 2.5f;
+const float PICKUP_DURATION = 0.5f;
+const float DEATH_DURATION = 3.0f;
+
 
 //=================================
 //		RESOURCE FILE PATHS

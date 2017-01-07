@@ -722,7 +722,7 @@ void Spacewar::KillEntities() {
 				iter = entities.erase(iter);
 			} break;
 			case OBJECT_TYPE_PLAYER: {
-										 player->getEffectTimers()->at(EFFECT_DEATH) = 3.0f;
+										 player->getEffectTimers()->at(EFFECT_DEATH) = DEATH_DURATION;
 										 
 										 if (player->getCurrentFrame() == player->getEndFrame() && !player->getPlayerDefaultTexture())
 										 {
@@ -826,7 +826,7 @@ void Spacewar::collisions() {
 																	  if (!player->hasEffect(EFFECT_INVULNERABLE) && !player->hasEffect((EFFECT_INVINCIBLE))){
 																	  	  PlaySound(PLAYER_DAMAGE_SOUND, NULL, SND_ASYNC);
 																		  printf("DAMAGE sound is played\n");
-																		  player->getEffectTimers()->at(EFFECT_INVULNERABLE) = 2.4f;
+																		  player->getEffectTimers()->at(EFFECT_INVULNERABLE) = INVUL_DURATION;
 																		  player->damage(WEAPON_BLACKHOLE);
 																		  combo = 0;
 																	  }
@@ -847,7 +847,7 @@ void Spacewar::collisions() {
 																	   printf("DAMAGE sound is played\n");
 
 																	   player->damage(WEAPON_CIRCLE);
-																	   player->getEffectTimers()->at(EFFECT_INVULNERABLE) = 2.4f;
+																	   player->getEffectTimers()->at(EFFECT_INVULNERABLE) = INVUL_DURATION;
 																	   combo = 0;
 																   }
 									  }	break;
@@ -866,7 +866,7 @@ void Spacewar::collisions() {
 																		 printf("DAMAGE sound is played\n");
 
 																		 player->damage(WEAPON_TRIANGLE);
-																		 player->getEffectTimers()->at(EFFECT_INVULNERABLE) = 2.4f;
+																		 player->getEffectTimers()->at(EFFECT_INVULNERABLE) = INVUL_DURATION;
 																		 combo = 0;
 																	 }
 									  }	break;
@@ -903,16 +903,16 @@ void Spacewar::collisions() {
 																										  freeze->setFrameDelay(freezeNS::ANIMATION_DELAY);
 																										  freeze->setRect();
 																										  tempVector.push_back(freeze);
-																										  player->getEffectTimers()->at(EFFECT_FROZEN) = 10.0f;
+																										  player->getEffectTimers()->at(EFFECT_FROZEN) = FREEZE_DURATION;
 																	   } break;
 																	   case PICKUP_DESTRUCTOR_INVINCIBILITY: {
-																												 player->getEffectTimers()->at(EFFECT_INVINCIBLE) = 10.0f;
+																												 player->getEffectTimers()->at(EFFECT_INVINCIBLE) = INVIN_DURATION;
 																	   } break;
 																	   case PICKUP_DESTRUCTOR_MISSLES: {
 																										   // get the enemies to target first
 																										   // discarded after this iteration
 																										   std::vector<Entity*> tempVect;
-																										   for (std::vector<Entity*>::iterator iter_ = entities.begin(); iter_ != entities.end(); iter_++) {
+																										   for (std::vector<Entity*>::iterator iter_ = entities.begin(); iter_ != entities.end(); ++iter_) {
 																											   if (
 																												   ((*iter_)->getObjectType() == OBJECT_TYPE_CIRCLE ||
 																												   (*iter_)->getObjectType() == OBJECT_TYPE_TRIANGLE ||
@@ -954,16 +954,16 @@ void Spacewar::collisions() {
 																											 tempVector.push_back(blackhole);
 																	   } break;
 																	   case PICKUP_OBSTRUCTOR_ENLARGE_PLAYER: {
-																												  player->getEffectTimers()->at(EFFECT_ENLARGED) = 5.0f;
+																												  player->getEffectTimers()->at(EFFECT_ENLARGED) = ENLARGE_DURATION;
 																	   } break;
 																	   case PICKUP_OBSTRUCTOR_INVERT_CONTROLS: {
-																												   player->getEffectTimers()->at(EFFECT_INVERTED) = 5.0f;
+																												   player->getEffectTimers()->at(EFFECT_INVERTED) = INVERTED_DURATION;
 																	   } break;
 																	   case PICKUP_OBSTRUCTOR_SLOW_PLAYER: {
-																											   player->getEffectTimers()->at(EFFECT_SLOW) = 5.0f;
+																											   player->getEffectTimers()->at(EFFECT_SLOW) = SLOW_DURATION;
 																	   } break;
 																	   case PICKUP_OBSTRUCTOR_STUN_PLAYER: {
-																											   player->getEffectTimers()->at(EFFECT_STUN) = 5.0f;
+																											   player->getEffectTimers()->at(EFFECT_STUN) = STUN_DURATION;
 																	   } break;
 																	   }
 
@@ -971,7 +971,7 @@ void Spacewar::collisions() {
 																	   if (temp_pickup->getPickupType() != PICKUP_HEALTH && temp_pickup->getPickupType() != PICKUP_DESTRUCTOR_EXPLOSION)
 																		   PlaySound(PLAYER_PICKUP_SOUND, NULL, SND_ASYNC);
 																	   temp_pickup->spawn();
-																	   player->getEffectTimers()->at(EFFECT_CANNOT_PICKUP) = 0.5f;
+																	   player->getEffectTimers()->at(EFFECT_CANNOT_PICKUP) = PICKUP_DURATION;
 																   }
 									  } break;
 									  }
