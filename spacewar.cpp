@@ -32,7 +32,6 @@ float	deathAngle;													// the angle in radians at the point in time of th
 float	waveBufferTime;												// a short peroid of time before the first wave and menu
 float	blackholeTimer;												// time where the blackhole is left in the entities vector
 
-int		playerMaxHealth, playerHealth;
 int		playerScore, highscore;										// highscore will be written in a file when it is greater than the current highscore
 int		combo, maxCombo;											// record combo
 int		currentWave;
@@ -157,8 +156,6 @@ void Spacewar::update() {
 								  PlaySound(PLAYER_SELECT_SOUND, NULL, SND_ASYNC);
 
 								  beatenHighScore = false;
-								  playerHealth = 3;
-								  playerMaxHealth = 10;
 								  combo = maxCombo = playerScore = 0;
 
 								  this->setGameState(GAME_STATE_GAME);
@@ -181,7 +178,7 @@ void Spacewar::update() {
 								  player->setVisible(true);
 								  player->setX(GAME_WIDTH / 2 - player->getWidth() / 2 * player->getScale());
 								  player->setY(GAME_HEIGHT / 2 - player->getHeight() / 2 * player->getScale());
-								  player->setHealth(playerHealth);
+								  player->setHealth(PLAYER_HEALTH);
 
 								  this->addEntity(player);
 

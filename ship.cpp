@@ -61,28 +61,32 @@ void Ship::draw() {
 //=============================================================================
 void Ship::update(float deltaTime)
 {
-	// bouncing off the side of the screen
-	Entity::update(deltaTime);
-	spriteData.angle += deltaTime * shipNS::ROTATION_RATE;
-	spriteData.x += deltaTime * velocity.x;
-	spriteData.y += deltaTime * velocity.y;
+	if (!this->hasEffect(EFFECT_DEATH))
+	{
+		spriteData.angle += deltaTime * shipNS::ROTATION_RATE;
+		spriteData.x += deltaTime * velocity.x;
+		spriteData.y += deltaTime * velocity.y;
 
-	if (spriteData.x > GAME_WIDTH - shipNS::WIDTH * this->getScale()) {
-		spriteData.x = GAME_WIDTH - shipNS::WIDTH * this->getScale();
-		velocity.x = -velocity.x;
+		// bounce off walls
+		if (spriteData.x > GAME_WIDTH - shipNS::WIDTH * this->getScale()) {
+			spriteData.x = GAME_WIDTH - shipNS::WIDTH * this->getScale();
+			velocity.x = -velocity.x;
+		}
+		else if (spriteData.x < 0) {
+			spriteData.x = 0;
+			velocity.x = -velocity.x;
+		}
+		if (spriteData.y > GAME_HEIGHT - shipNS::HEIGHT  * this->getScale()) {
+			spriteData.y = GAME_HEIGHT - shipNS::HEIGHT  * this->getScale();
+			velocity.y = -velocity.y;
+		}
+		else if (spriteData.y < 0) {
+			spriteData.y = 0;
+			velocity.y = -velocity.y;
+		}
 	}
-	else if (spriteData.x < 0) {
-		spriteData.x = 0;
-		velocity.x = -velocity.x;
-	}
-	if (spriteData.y > GAME_HEIGHT - shipNS::HEIGHT  * this->getScale()) {
-		spriteData.y = GAME_HEIGHT - shipNS::HEIGHT  * this->getScale();
-		velocity.y = -velocity.y;
-	}
-	else if (spriteData.y < 0) {
-		spriteData.y = 0;
-		velocity.y = -velocity.y;
-	}
+
+	Entity::update(deltaTime);
 }
 
 void Ship::damage(WEAPON weapon) {
@@ -199,18 +203,16 @@ void Ship::triggerEffect(EffectType effect)
 	{
 						 if (this->hasEffect(EFFECT_DEATH))
 						 {
-							 this->setVelocity(0, 0);
-							 printf("%d\n", this->getCurrentFrame());
-
+							 this->setX(this->getX() + this->getWidth() / 2 * this->getScale() - (this->getWidth() / 2 * P_DEATH_SCALING));
+							 this->setY(this->getY() + this->getHeight() / 2 * this->getScale() - (this->getHeight() / 2 * P_DEATH_SCALING));
+							 
 							 // death animation
 							 if (this->getPlayerDefaultTexture())
 							 {
-								 this->setHeight(P_DEATH_HEIGHT);
-								 this->setWidth(P_DEATH_WIDTH);
-								 this->setColumns(P_DEATH_COLS);
 								 this->setFrames(P_DEATH_START_FRAME, P_DEATH_END_FRAME);
 								 this->setCurrentFrame(P_DEATH_START_FRAME);
 								 this->setFrameDelay(P_DEATH_ANIMATION_DELAY);
+								 this->setScale(P_DEATH_SCALING);
 								 this->setLoop(P_DEATH_LOOP);
 
 								 PlaySound(PLAYER_DEAD_SOUND, NULL, SND_ASYNC);

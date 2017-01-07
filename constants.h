@@ -55,24 +55,24 @@ const float MASS_PLANET = 1.0e14f;
 const float MASS_SHIP = 5.0f;
 
 // player
+const int PLAYER_HEALTH					= 1;						// player starting health
+const int PLAYER_MAX_HEALTH				= 10;						// player maximum health
 const int PLAYER_START_FRAME			= 0;						// player starts at frame 0
 const int PLAYER_END_FRAME				= 3;						// player animation frames 0,1,2,3
-const float	PLAYER_SCALING				= 0.5f;						// player sprite scaling		
-const int P_DEATH_HEIGHT				= 256;						// player death height
-const int P_DEATH_WIDTH					= 256;						// player death width
-const int P_DEATH_COLS					= 8;						// player death columns
-const int P_DEATH_START_FRAME			= 7;						// player death start frame number
-const int P_DEATH_END_FRAME				= 32;						// player death end frame number
+const float	PLAYER_SCALING				= 0.25f;						// player sprite scaling		
+const int P_DEATH_START_FRAME			= 16;						// player death start frame number
+const int P_DEATH_END_FRAME				= 40;						// player death end frame number
+const float P_DEATH_SCALING				= 0.5f; 					// player death scaling
 const float P_DEATH_ANIMATION_DELAY		= 0.1f;						// player death animation time between frames
 const bool P_DEATH_LOOP					= false;					// player death animation loop
 const int P_INVUL_START_FRAME			= 8;						// player invul start frame number
 const int P_INVUL_END_FRAME				= 15;						// player invul end frame number
-const float P_INVUL_SCALE				= 0.5f;						// player invul starting scale
+const float P_INVUL_SCALE				= 0.25f;						// player invul starting scale
 const float P_INVUL_ANIMATION_DELAY		= 0.1f;						// player invul animation time between frames
 const bool P_INVUL_LOOP					= true;						// player invul animation loop	
 const int P_INVIN_START_FRAME			= 3;						// player invin start frame number
 const int P_INVIN_END_FRAME				= 7;						// player invin end frame number
-const float P_INVIN_SCALE				= 0.5f;						// player invin starting scale
+const float P_INVIN_SCALE				= 0.25f;						// player invin starting scale
 const float P_INVIN_ANIMATION_DELAY		= 0.1f;						// player invin animation time between frames
 const bool P_INVIN_LOOP					= true;						// Player invin animation loop
 
