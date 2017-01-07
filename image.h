@@ -68,6 +68,9 @@ class Image
     // Return height.
     virtual int   getHeight()   {return spriteData.height;}
 
+	// Return columns
+	virtual int   getColumns(){ return cols; }
+
     // Return center X.
     virtual float getCenterX()      {return spriteData.x + spriteData.width/2*getScale();}
 
@@ -113,6 +116,15 @@ class Image
 
     // Set scale.
     virtual void setScale(float s)  {spriteData.scale = s;}
+
+	// Set Height
+	virtual void setHeight(int height) { this->spriteData.height = height; }
+
+	// Set Width
+	virtual void setWidth(int width) { this->spriteData.width = width; }
+
+	// Set Columns
+	virtual void setColumns(int columns) { this->cols = columns; }
 
     // Set rotation angle in degrees.
     // 0 degrees is up. Angles progress clockwise.

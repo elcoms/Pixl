@@ -38,7 +38,7 @@ int		combo, maxCombo;											// record combo
 int		currentWave;
 
 bool	waveOver;
-bool	playerIsDead, playerCanPickup;
+bool	playerCanPickup;
 bool	beatenHighScore;
 
 DWORD	baseTime;
@@ -57,7 +57,7 @@ void Spacewar::initialize(HWND hwnd)	 {
 
 	Game::initialize(hwnd);
 
-	//AllocConsole();		// Console for debugging
+	AllocConsole();		// Console for debugging
 	freopen("conin$", "r", stdin);
 	freopen("conout$", "w", stdout);
 	freopen("conout$", "w", stderr);
@@ -67,7 +67,6 @@ void Spacewar::initialize(HWND hwnd)	 {
 	//=================================================
 	// Player
 	shipTextures.initialize(graphics, PLAYER_TEXTURE);
-	p_deathTextures.initialize(graphics, PLAYER_DEATH_TEXTURE);
 
 	// Enemy
 	triangleTextures.initialize(graphics, TRIANGLE_TEXTURE);
@@ -160,7 +159,6 @@ void Spacewar::update() {
 								  beatenHighScore = false;
 								  playerHealth = 3;
 								  playerMaxHealth = 10;
-								  playerIsDead = false;
 								  combo = maxCombo = playerScore = 0;
 
 								  this->setGameState(GAME_STATE_GAME);
@@ -176,8 +174,8 @@ void Spacewar::update() {
 								  // Player
 								  player = new Ship();
 								  player->initialize(this, shipNS::WIDTH, shipNS::HEIGHT, shipNS::TEXTURE_COLS, &shipTextures);
-								  player->setCurrentFrame(player_START_FRAME);
-								  player->setFrames(player_START_FRAME, player_END_FRAME);
+								  player->setCurrentFrame(PLAYER_START_FRAME);
+								  player->setFrames(PLAYER_START_FRAME, PLAYER_END_FRAME);
 								  player->setObjectType(OBJECT_TYPE_PLAYER);
 								  player->setRadians(0);
 								  player->setVisible(true);
@@ -274,7 +272,7 @@ void Spacewar::update() {
 
 							  // checks the collision of missiles and entites here
 							  VECTOR2 collisionVector;
-							  for (std::vector<Missile*>::iterator iter = missiles.begin(); iter != missiles.end(); iter++) {
+							  for (std::vector<Missile*>::iterator iter = missiles.begin(); iter != missiles.end(); ++iter) {
 								  (*iter)->update(deltaTime);
 								  // Re-targets a new enemy if the previous target dies before the missile collides with it
 								  if ((*iter)->getTarget()->getActive()) {
@@ -320,7 +318,7 @@ void Spacewar::update() {
 							  }
 
 							  // explosion detection
-							  for (std::vector<Entity*>::iterator iter = entities.begin(); iter != entities.end(); iter++) {
+							  for (std::vector<Entity*>::iterator iter = entities.begin(); iter != entities.end(); ++iter) {
 								  if ((*iter)->getObjectType() == OBJECT_TYPE_EXPLOSION) {
 									  for (std::vector<Entity*>::iterator iter_ = entities.begin(); iter_ != entities.end(); iter_++) {
 										  if (((*iter_)->getObjectType() == OBJECT_TYPE_CIRCLE ||
@@ -450,11 +448,11 @@ void Spacewar::render() {
 									  ss.str("HIGHSCORE: " + std::to_string(highscore));													// latest highscore
 									  scoreFont->Print(10, 0, ss.str());
 									  
-									  for (std::vector<Entity*>::iterator iter = hearts.begin(); iter != hearts.end(); iter++) {
+									  for (std::vector<Entity*>::iterator iter = hearts.begin(); iter != hearts.end(); ++iter) {
 										  (*iter)->draw();
 									  }
 									  PrintEffect(player, effectFont);
-									  for (std::vector<Missile*>::iterator iter = missiles.begin(); iter != missiles.end(); iter++) {
+									  for (std::vector<Missile*>::iterator iter = missiles.begin(); iter != missiles.end(); ++iter) {
 										  (*iter)->draw();
 									  }
 								  }
@@ -477,12 +475,12 @@ void Spacewar::render() {
 								  ss.str("HIGHSCORE: " + std::to_string(highscore));													// latest highscore
 								  scoreFont->Print(10, 0, ss.str());
 
-								  for (std::vector<Entity*>::iterator iter = hearts.begin(); iter != hearts.end(); iter++) {
+								  for (std::vector<Entity*>::iterator iter = hearts.begin(); iter != hearts.end(); ++iter) {
 									  (*iter)->draw();
 								  }
 								  float dy = 10;
 								  PrintEffect(player, effectFont);
-								  for (std::vector<Missile*>::iterator iter = missiles.begin(); iter != missiles.end(); iter++) {
+								  for (std::vector<Missile*>::iterator iter = missiles.begin(); iter != missiles.end(); ++iter) {
 									  (*iter)->draw();
 								  }
 							  }
@@ -542,7 +540,6 @@ void Spacewar::render() {
 void Spacewar::releaseAll() {
 	shipTextures.onResetDevice();
 	circleTextures.onResetDevice();
-	p_deathTextures.onResetDevice();
 	triangleTextures.onResetDevice();
 	circleTextures.onResetDevice();
 	blackHoleTexture.onResetDevice();
@@ -559,7 +556,6 @@ void Spacewar::resetAll() {
 	triangleTextures.onResetDevice();
 	shipTextures.onResetDevice();
 	circleTextures.onResetDevice();
-	p_deathTextures.onResetDevice();
 	triangleTextures.onResetDevice();
 	circleTextures.onResetDevice();
 	blackHoleTexture.onResetDevice();
@@ -579,11 +575,10 @@ void Spacewar::addEntity(Entity* entity) {
 }
 
 void Spacewar::UpdateEntities() {
-	for (std::vector<Entity*>::iterator iter = entities.begin(); iter != entities.end(); iter++) {
+	for (std::vector<Entity*>::iterator iter = entities.begin(); iter != entities.end(); ++iter) {
 		// Update each entity based on their object types
 		switch ((*iter)->getObjectType()) {
 		case OBJECT_TYPE_PLAYER: {
-
 										//					Key Inputs
 										//=================================================
 									 if (input->isKeyDown(VK_UP)) {
@@ -637,7 +632,7 @@ void Spacewar::UpdateEntities() {
 										 {
 											 iter_->second -= deltaTime;
 
-											 (*iter)->triggerEffect(iter_->first);			// function to handle effects in entity class
+											 player->triggerEffect(iter_->first);			// function to handle effects in player class
 										 }
 									 }
 
@@ -703,7 +698,7 @@ void Spacewar::UpdateEntities() {
 void Spacewar::KillEntities() {
 	std::vector<Entity*>::iterator iter = entities.begin();
 	while (iter != entities.end()) {
-		if ((*iter)->getHealth() <= 0) {
+		if ((*iter)->getHealth() <= 0 && !player->hasEffect(EFFECT_DEATH)) {
 			// whatever happends on death of the entity goes here
 			// death only happens when health drops to 0
 			// will be kept simple to prevent modifying the iterator while deleting an item
@@ -730,27 +725,38 @@ void Spacewar::KillEntities() {
 				iter = entities.erase(iter);
 			} break;
 			case OBJECT_TYPE_PLAYER: {
-				(*iter)->setActive(false);
-				(*iter)->setVisible(false);
-				iter = entities.erase(iter);
+										 player->getEffectTimers()->at(EFFECT_DEATH) = 3.0f;
+										 
+										 if (player->getCurrentFrame() == player->getEndFrame() && !player->getPlayerDefaultTexture())
+										 {
+											 (*iter)->setActive(false);
+											 (*iter)->setVisible(false);
+											 iter = entities.erase(iter);
 
-				PlaySound(PLAYER_DEAD_SOUND, NULL, SND_FILENAME);
-				printf("You DEAD son\n");
+											 FILE* file;
 
-				FILE* file;
+											 // if beaten highscore then write it to file
+											 // expensive IO opration only happens once in the game loop
+											 // there shouldn't be much impact
+											 if (playerScore > highscore)
+											 {
+												 beatenHighScore = true;
+												 file = fopen(HIGHSCORE_FILE, "w");
+												 highscore = playerScore;
+												 fprintf(file, "%d", highscore);
+												 fclose(file);
+											 }
 
-				// if beaten highscore then write it to file
-				// expensive IO opration only happens once in the game loop
-				// there shouldn't be much impact
-				if (playerScore > highscore) {
-					beatenHighScore = true;
-					file = fopen(HIGHSCORE_FILE, "w");
-					highscore = playerScore;
-					fprintf(file, "%d", highscore);
-					fclose(file);
-				}
+											 this->setGameState(GAME_STATE_GAMEOVER);
+										 }
+										 
+				//(*iter)->setActive(false);
+				//(*iter)->setVisible(false);
+				//iter = entities.erase(iter);
 
-				this->setGameState(GAME_STATE_GAMEOVER);
+				//PlaySound(PLAYER_DEAD_SOUND, NULL, SND_FILENAME);
+				//printf("You DEAD son\n");\
+
 			} break;
 			case OBJECT_TYPE_SQUARES: {
 				(*iter)->setActive(false);
@@ -775,7 +781,7 @@ void Spacewar::KillEntities() {
 			} break;
 			}
 		}
-		else iter++;
+		else ++iter;
 	}
 
 	// remove missiles that are not targeting anything
@@ -790,7 +796,7 @@ void Spacewar::KillEntities() {
 
 // draw all entites
 void Spacewar::DrawEntities() {
-	for (std::vector<Entity*>::iterator iter = entities.begin(); iter != entities.end(); iter++) {
+	for (std::vector<Entity*>::iterator iter = entities.begin(); iter != entities.end(); ++iter) {
 		(*iter)->draw();
 	}
 }
@@ -811,7 +817,7 @@ void Spacewar::collisions() {
 	case GAME_STATE_GAME: {
 							  VECTOR2 collisionVector;
 
-							  for (std::vector<Entity*>::iterator iter = entities.begin(); iter != entities.end(); iter++) {
+							  for (std::vector<Entity*>::iterator iter = entities.begin(); iter != entities.end(); ++iter) {
 								  Entity* entity = *iter;
 
 								  // run the following code when player collides with the following entity
@@ -948,7 +954,7 @@ void Spacewar::collisions() {
 																											 blackhole->setX(minMaxRand(blackhole->getWidth(), GAME_WIDTH - 2 * blackhole->getWidth()));
 																											 blackhole->setY(minMaxRand(blackhole->getWidth(), GAME_WIDTH - 2 * blackhole->getWidth()));
 
-																											 addEntity(blackhole);
+																											 tempVector.push_back(blackhole);
 																	   } break;
 																	   case PICKUP_OBSTRUCTOR_ENLARGE_PLAYER: {
 																												  player->getEffectTimers()->at(EFFECT_ENLARGED) = 5.0f;
@@ -976,7 +982,7 @@ void Spacewar::collisions() {
 							  }
 
 							  // adds all entities stored in the temporary vector data structure
-							  for (std::vector<Entity*>::iterator iter = tempVector.begin(); iter != tempVector.end(); iter++) {
+							  for (std::vector<Entity*>::iterator iter = tempVector.begin(); iter != tempVector.end(); ++iter) {
 								  addEntity(*iter);
 							  }
 	} break;
@@ -1020,7 +1026,7 @@ void PrintEffect(Entity* entity, Font* effectFont) {
 	// ============================================
 
 	float dy = 10;
-	for (std::map<EffectType, float>::iterator iter = entity->getEffectTimers()->begin(); iter != entity->getEffectTimers()->end(); iter++) {
+	for (std::map<EffectType, float>::iterator iter = entity->getEffectTimers()->begin(); iter != entity->getEffectTimers()->end(); ++iter) {
 		if (entity->hasEffect((*iter).first)) {
 			ss.str("");
 			switch ((*iter).first) {
@@ -1065,7 +1071,7 @@ void PrintEffect(Entity* entity, Font* effectFont) {
 }
 
 bool isWaveOver(std::vector<Entity*> entities) {
-	for (std::vector<Entity*>::iterator iter = entities.begin(); iter != entities.end(); iter++) {
+	for (std::vector<Entity*>::iterator iter = entities.begin(); iter != entities.end(); ++iter) {
 		if ((
 			(*iter)->getObjectType() == OBJECT_TYPE_BOSS ||
 			(*iter)->getObjectType() == OBJECT_TYPE_TRIANGLE ||
@@ -1079,7 +1085,7 @@ bool isWaveOver(std::vector<Entity*> entities) {
 }
 
 bool isTargeted(std::vector<Missile*> missiles, Entity* entity) {
-	for (std::vector<Missile*>::iterator iter = missiles.begin(); iter != missiles.end(); iter++) {
+	for (std::vector<Missile*>::iterator iter = missiles.begin(); iter != missiles.end(); ++iter) {
 		if ((*iter)->getTarget() == entity)
 			return true;
 	}

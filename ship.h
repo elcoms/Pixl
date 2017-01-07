@@ -23,12 +23,13 @@ namespace shipNS {
 	const float ROTATION_RATE = 0;
 	const float SPEED = 100;					// 100 pixels per second
 	const float MASS = 300.0f;					// mass
-	const int   TEXTURE_COLS = 4;
+	const int   TEXTURE_COLS = 16;
 }
 
 // inherits from Entity class
 class Ship : public Entity {
 public:
+	bool	startDeathAnimation;
 	bool	playerDefaultTexture;				// true/false based on whether player has their starting texture or changed
 	
 	// constructor
@@ -39,12 +40,14 @@ public:
 	virtual bool initialize(Game *gamePtr, int width, int height, int ncols, TextureManager *textureM);
 	void update(float deltaTime);
 	void damage(WEAPON);
+	void triggerEffect(EffectType effect);
 
 	// GET functions
 	bool getPlayerDefaultTexture(){ return playerDefaultTexture; };
 
 	// SET functions
 	void setPlayerDefaultTexture(bool PDT){ playerDefaultTexture = PDT; };
+
 };
 #endif
 

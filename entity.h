@@ -47,7 +47,8 @@ enum EffectType {
 	EFFECT_INVULNERABLE,
 	EFFECT_FROZEN,
 	EFFECT_ENLARGED,
-	EFFECT_CANNOT_PICKUP
+	EFFECT_CANNOT_PICKUP,
+	EFFECT_DEATH
 };
 
 class Entity : public Image {
@@ -115,9 +116,6 @@ public:
 		center = VECTOR2(getCenterX(), getCenterY());
 		return &center;
 	}
-
-	void setHeight(int height) { this->spriteData.height = height; }
-	void setWidth(int width) { this->spriteData.width = width; }
 
 	// Return radius of collision circle.
 	virtual float getRadius() const     { return radius; }

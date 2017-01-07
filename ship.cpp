@@ -17,15 +17,15 @@
 Ship::Ship() : Entity() {
 	spriteData.width = shipNS::WIDTH;
 	spriteData.height = shipNS::HEIGHT;
-	spriteData.scale = player_SCALING;
+	spriteData.scale = PLAYER_SCALING;
 	spriteData.x = shipNS::X;
 	spriteData.y = shipNS::Y;
 	spriteData.rect.bottom = shipNS::HEIGHT;
 	spriteData.rect.right = shipNS::WIDTH;
 	velocity.x = 0;
 	velocity.y = 0;
-	startFrame = player_START_FRAME;
-	endFrame = player_END_FRAME;
+	startFrame = PLAYER_START_FRAME;
+	endFrame = PLAYER_END_FRAME;
 	currentFrame = startFrame;
 	radius = shipNS::WIDTH / 2.0;
 	mass = shipNS::MASS;
@@ -41,11 +41,12 @@ Ship::Ship() : Entity() {
 	effectTimers.insert(std::pair<EffectType, float>(EFFECT_FROZEN, 0.0f));
 	effectTimers.insert(std::pair<EffectType, float>(EFFECT_ENLARGED, 0.0f));
 	effectTimers.insert(std::pair<EffectType, float>(EFFECT_CANNOT_PICKUP, 0.0f));
+	effectTimers.insert(std::pair<EffectType, float>(EFFECT_DEATH, 0.0f));
 }
 
 bool Ship::initialize(Game *gamePtr, int width, int height, int ncols, TextureManager *textureM) {
 	bool error = Entity::initialize(gamePtr, width, height, ncols, textureM);
-	this->setAnimationComplete(true);
+	//this->setAnimationComplete(true);
 	return error;
 }
 
@@ -107,4 +108,118 @@ void Ship::damage(WEAPON weapon) {
 
 	if (this->getHealth() < 0)
 		this->setHealth(0);
+}
+
+void Ship::triggerEffect(EffectType effect)
+{
+	switch (effect) {
+	case EFFECT_ENLARGED:
+	{
+							if (this->hasEffect(EFFECT_ENLARGED)) {
+								this->setScale(PLAYER_SCALING * 2);
+							}
+							else {
+								this->setScale(PLAYER_SCALING);
+							}
+	}
+
+	case EFFECT_STUN: {
+						  if (this->hasEffect(EFFECT_STUN))
+							  this->setVelocity(0, 0);
+	} break;
+
+	case EFFECT_INVINCIBLE: {
+
+								if (this->hasEffect(EFFECT_INVINCIBLE))
+								{
+									// if the frames are not invincible, set the correct frames
+									// else do nothing
+									if (this->getCurrentFrame() < P_INVIN_START_FRAME || this->getCurrentFrame() > P_INVIN_END_FRAME)
+									{
+										this->setFrames(P_INVIN_START_FRAME, P_INVIN_END_FRAME);
+										this->setCurrentFrame(P_INVIN_START_FRAME);
+										this->setFrameDelay(P_INVIN_ANIMATION_DELAY);
+										this->setLoop(P_INVIN_LOOP);
+										this->setScale(P_INVIN_SCALE);
+									}
+								}
+								else // no longer invincible
+								{
+									//	if the frames are not back to default, set the correct frames
+									// else do nothing
+									if (this->getCurrentFrame() > P_INVIN_START_FRAME || this->getCurrentFrame() < P_INVIN_END_FRAME)
+									{
+										this->setFrames(PLAYER_START_FRAME, PLAYER_END_FRAME);
+										this->setCurrentFrame(PLAYER_START_FRAME);
+										this->setScale(PLAYER_SCALING);
+									}
+								}
+
+	} break;
+
+	case EFFECT_SLOW: {
+						  if (this->hasEffect(EFFECT_SLOW)) {
+							  this->setVelocity(this->getVelocity().x / 1.05, this->getVelocity().y / 1.05);
+						  }
+	} break;
+
+	case EFFECT_INVULNERABLE: {
+
+								  // if player is alive
+								  if (this->getHealth() != 0)
+								  {
+									  if (this->hasEffect(EFFECT_INVULNERABLE))
+									  {
+										  // if the frames are not invulnerable, set the correct frames
+										  // else do nothing
+										  if (this->getCurrentFrame() < P_INVUL_START_FRAME || this->getCurrentFrame() > P_INVUL_END_FRAME)
+										  {
+											  this->setFrames(P_INVUL_START_FRAME, P_INVUL_END_FRAME);
+											  this->setCurrentFrame(P_INVUL_START_FRAME);
+											  this->setFrameDelay(P_INVUL_ANIMATION_DELAY);
+											  this->setLoop(P_INVUL_LOOP);
+											  this->setScale(P_INVUL_SCALE);
+										  }
+									  }
+									  else // no longer invulnerable
+									  {
+										  //	if the frames are not back to default, set the correct frames
+										  // else do nothing
+										  if (this->getCurrentFrame() > P_INVUL_START_FRAME || this->getCurrentFrame() < P_INVUL_END_FRAME)
+										  {
+											  this->setFrames(PLAYER_START_FRAME, PLAYER_END_FRAME);
+											  this->setCurrentFrame(PLAYER_START_FRAME);
+											  this->setScale(PLAYER_SCALING);
+										  }
+									  }
+								  }
+	} break;
+
+	case EFFECT_DEATH:
+	{
+						 if (this->hasEffect(EFFECT_DEATH))
+						 {
+							 this->setVelocity(0, 0);
+							 printf("%d\n", this->getCurrentFrame());
+
+							 // death animation
+							 if (this->getPlayerDefaultTexture())
+							 {
+								 this->setHeight(P_DEATH_HEIGHT);
+								 this->setWidth(P_DEATH_WIDTH);
+								 this->setColumns(P_DEATH_COLS);
+								 this->setFrames(P_DEATH_START_FRAME, P_DEATH_END_FRAME);
+								 this->setCurrentFrame(P_DEATH_START_FRAME);
+								 this->setFrameDelay(P_DEATH_ANIMATION_DELAY);
+								 this->setLoop(P_DEATH_LOOP);
+
+								 PlaySound(PLAYER_DEAD_SOUND, NULL, SND_ASYNC);
+								 printf("You DEAD son\n");
+
+								 this->setPlayerDefaultTexture(false);
+							 }
+						 }
+						 }
+						 
+	}
 }
