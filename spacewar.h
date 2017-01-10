@@ -13,18 +13,20 @@
 #define _SPACEWAR_H           
 #define WIN32_LEAN_AND_MEAN
 
+
 #include "game.h"
 #include "textureManager.h"
 #include "image.h"
 #include "ship.h"
-#include "Font.h"
 #include "Triangle.h"
 #include "Circle.h"
-#include "Blackhole.h"
 #include "Missile.h"
 #include "Pickup.h"
+#include "Blackhole.h"
 #include "Explosion.h"
 #include "Freeze.h"
+#include "Font.h"
+#include "Effects.h"
 
 enum GameState {
 	GAME_STATE_MENU,
@@ -39,9 +41,6 @@ private:
 	// game items
 	// Player
 	TextureManager			shipTextures;
-	TextureManager			p_deathTextures;
-	TextureManager			p_invulTextures;
-	TextureManager			p_invinTextures;
 
 	// Enemy
 	TextureManager			triangleTextures;

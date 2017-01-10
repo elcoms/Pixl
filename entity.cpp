@@ -450,3 +450,11 @@ void Entity::gravityForce(Entity *ent, float deltaTime)
     // Add gravity vector to moving velocity vector to change direction
     velocity += gravityV;
 }
+
+//================================================================================
+// switch-case method
+// sets the player's properties (or any other entity) according to its EffectType
+//================================================================================
+void Entity::triggerEffect(EffectType effect)
+{
+}
