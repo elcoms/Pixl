@@ -17,6 +17,7 @@
 #include <Mmsystem.h>
 #include "graphics.h"
 #include "input.h"
+#include "audio.h"
 #include <vector>
 #include "constants.h"
 #include "gameError.h"
@@ -25,10 +26,10 @@ class Game {
 protected:
 	// common game properties
 
-	Graphics *graphics;         // pointer to Graphics
-	Input   *input;             // pointer to Input
-	HWND    hwnd;               // window handle
-	HRESULT hr;                 // standard return type
+	Graphics	*graphics;      // pointer to Graphics
+	Input		*input;			// pointer to Input
+	HWND		hwnd;           // window handle
+	HRESULT		hr;             // standard return type
 	LARGE_INTEGER timeStart;    // Performance Counter start value
 	LARGE_INTEGER timeEnd;      // Performance Counter end value
 	LARGE_INTEGER timerFreq;    // Performance Counter frequency
@@ -43,6 +44,8 @@ public:
 	Game();
 	// Destructor
 	virtual ~Game();
+
+	Audio*		audio;
 
 	// Member functions
 

@@ -89,7 +89,7 @@ const float INVIN_DURATION = 5.0f;
 
 // Others
 const float INVUL_DURATION = 2.5f;
-const float PICKUP_DURATION = 0.5f;
+const float PICKUP_DURATION = 0.2f;
 const float DEATH_DURATION = 3.0f;
 
 
@@ -117,12 +117,23 @@ const char FONT_TEXTURE_INFO[]				= "resources\\data\\font.dat";
 const char HEART_TEXTURE[] 					= "resources\\images\\sprite_hearts.png";
 
 // Sound 
-const char PLAYER_PICKUP_SOUND[]			= "resources\\sounds\\pickup_good.wav";		// player pick up a pickup
-const char PLAYER_PICKUP_HEART_SOUND[]		= "resources\\sounds\\pickup_heart.wav";	// player pickup a heart
-const char PLAYER_DAMAGE_SOUND[]			= "resources\\sounds\\damage_player.wav";	// player gets damaged
-const char PLAYER_SELECT_SOUND[]			= "resources\\sounds\\push_button.wav";		// player pushes space or esc
-const char PICKUP_EXPLODE_SOUND[]			= "resources\\sounds\\explosion.wav";		// explosion pickup, well explodes
-const char PLAYER_DEAD_SOUND[]				= "resources\\sounds\\player_dead.wav";		// player is killed
+const char PLAYER_PICKUP_SOUND[]			= "pickup_good";			// player pick up a pickup
+const char PLAYER_PICKUP_HEART_SOUND[]		= "pickup_heart";			// player pickup a heart
+const char PLAYER_DAMAGE_SOUND[]			= "damage_player";			// player gets damaged
+const char PLAYER_SELECT_SOUND[]			= "push_button";			// player pushes space or esc
+const char PICKUP_EXPLODE_SOUND[]			= "explosion";				// explosion pickup, well explodes
+const char PLAYER_DEAD_SOUND[]				= "player_dead";			// player is killed
+
+// audio file required by audio.cpp
+
+// WAVE_BANK must be the location of the xwb file
+const char WAVE_BANK[] = "resources\\sounds\\Win\\Wave Bank.xwb";
+
+// SOUND_BANK must be location of .xsb file
+const char SOUND_BANK[] = "resources\\sounds\\Win\\Sound Bank.xsb";
+
+// XGS_FILE must be location of .xgs file.
+const char XGS_FILE[] = "resources\\sounds\\Win\\pixl-sound.xgs";
 
 const char HIGHSCORE_FILE[]					= "resources\\data\\highscore.dat";
 

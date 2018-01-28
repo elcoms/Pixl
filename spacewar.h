@@ -13,7 +13,7 @@
 #define _SPACEWAR_H           
 #define WIN32_LEAN_AND_MEAN
 
-
+#include "audio.h"
 #include "game.h"
 #include "textureManager.h"
 #include "image.h"
@@ -28,6 +28,13 @@
 #include "Font.h"
 #include "Effects.h"
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <timeapi.h>
+#include <sstream>
+#include <iomanip>
+#include <fstream>
+
 enum GameState {
 	GAME_STATE_MENU,
 	GAME_STATE_GAME,
@@ -37,6 +44,8 @@ enum GameState {
 
 class Spacewar : public Game {
 private:
+
+	Audio* audio;
 
 	// game items
 	// Player

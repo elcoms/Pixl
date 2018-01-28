@@ -5,12 +5,6 @@
 //					Amos Tan		(S10158017D)
 
 #include "spaceWar.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <timeapi.h>
-#include <sstream>
-#include <iomanip>
-#include <fstream>
 
 // calculates the number of enemies
 #define TRIANGLE_COUNT(x) (x * 0.15 * 16)
@@ -55,6 +49,8 @@ void Spacewar::initialize(HWND hwnd)	 {
 	srand(timeGetTime());
 
 	Game::initialize(hwnd);
+
+	audio = Game::audio;
 
 	AllocConsole();		// Console for debugging
 	freopen("conin$", "r", stdin);
@@ -153,7 +149,7 @@ void Spacewar::update() {
 									// Start the game state if the spacebar is pressed
 									// Variables that may have be changed in the previous state(s) will be set to 0/original values again
 							  if (input->isKeyDown(ENTER) || input->isKeyDown(SPACEBAR)){
-								  PlaySound(PLAYER_SELECT_SOUND, NULL, SND_ASYNC);
+								  audio->playCue(PLAYER_SELECT_SOUND);
 
 								  beatenHighScore = false;
 								  combo = maxCombo = playerScore = 0;
@@ -353,7 +349,7 @@ void Spacewar::update() {
 
 							  // Pressing ESC Key returns player to Main Menu
 							  if (input->isKeyDown(ESC_KEY)) {
-								  PlaySound(PLAYER_SELECT_SOUND, NULL, SND_ASYNC);
+								  audio->playCue(PLAYER_SELECT_SOUND);
 
 								  entities.clear();
 								  this->setGameState(GAME_STATE_MENU);
@@ -371,7 +367,7 @@ void Spacewar::update() {
 									// Code to run after the player dies and the score is shown
 									// Press ESC Key to return to Main Menu
 								  if (input->isKeyDown(ESC_KEY) || input->isKeyDown(SPACEBAR)) {
-									  PlaySound(PLAYER_SELECT_SOUND, NULL, SND_ASYNC);
+									  audio->playCue(PLAYER_SELECT_SOUND);
 									  printf("SELECT sound is played\n");
 
 			this->setGameState(GAME_STATE_MENU);
@@ -729,11 +725,13 @@ void Spacewar::KillEntities() {
 			case OBJECT_TYPE_PLAYER: {
 										 player->getEffectTimers()->at(EFFECT_DEATH) = DEATH_DURATION;
 										 
-										 if (player->getCurrentFrame() == player->getEndFrame() && !player->getPlayerDefaultTexture())
+										 if (player->getCurrentFrame() == player->getEndFrame())
 										 {
 											 (*iter)->setActive(false);
 											 (*iter)->setVisible(false);
 											 iter = entities.erase(iter);
+
+											 audio->playCue(PLAYER_DEAD_SOUND);
 
 											 FILE* file;
 
@@ -829,7 +827,7 @@ void Spacewar::collisions() {
 									  case OBJECT_TYPE_BLACKHOLE: {
 																	// Plays sound and kills player if blackhole is touched when player is not invulnerable and invincible
 																	  if (!player->hasEffect(EFFECT_INVULNERABLE) && !player->hasEffect((EFFECT_INVINCIBLE))){
-																	  	  PlaySound(PLAYER_DAMAGE_SOUND, NULL, SND_ASYNC);
+																		  audio->playCue(PLAYER_DAMAGE_SOUND);
 																		  printf("DAMAGE sound is played\n");
 																		  player->getEffectTimers()->at(EFFECT_INVULNERABLE) = INVUL_DURATION;
 																		  player->damage(WEAPON_BLACKHOLE);
@@ -848,7 +846,7 @@ void Spacewar::collisions() {
 
 																   // Plays sound and damages player if circle is touched when player is not invulnerable or invincible
 																   else if (!player->hasEffect(EFFECT_INVULNERABLE) && !player->hasEffect(EFFECT_INVINCIBLE)) {
-																	   PlaySound(PLAYER_DAMAGE_SOUND, NULL, SND_ASYNC);
+																	   audio->playCue(PLAYER_DAMAGE_SOUND);
 																	   printf("DAMAGE sound is played\n");
 
 																	   player->damage(WEAPON_CIRCLE);
@@ -867,7 +865,7 @@ void Spacewar::collisions() {
 
 																	 // Plays sound and damages player if triangle is touched when player is not invulnerable and invincible
 																	 else if (!player->hasEffect(EFFECT_INVULNERABLE) && !player->hasEffect(EFFECT_INVINCIBLE)) {
-																		 PlaySound(PLAYER_DAMAGE_SOUND, NULL, SND_ASYNC);
+																		 audio->playCue(PLAYER_DAMAGE_SOUND);
 																		 printf("DAMAGE sound is played\n");
 
 																		 player->damage(WEAPON_TRIANGLE);
@@ -886,64 +884,68 @@ void Spacewar::collisions() {
 
 																	   switch (temp_pickup->getPickupType()) {
 																	   case PICKUP_DESTRUCTOR_EXPLOSION: {
-																											 Explosion* explosion = new Explosion();
-																											 explosion->initialize(this, explosion->getWidth(), explosion->getHeight(), explosionNS::TEXTURE_COLS, &explosionTexture);
-																											 explosion->setX(temp_pickup->getX() + temp_pickup->getWidth() * temp_pickup->getScale() / 2 - (explosion->getWidth() / 2 * explosion->getScale()));
-																											 explosion->setY(temp_pickup->getY() + temp_pickup->getHeight() * temp_pickup->getScale() / 2 - (explosion->getHeight() / 2 * explosion->getScale()));
-																											 explosion->setFrameDelay(explosionNS::ANIMATION_DELAY);
-																											 explosion->setCollisionRadius(explosionNS::WIDTH / 2.0f);
-																											 tempVector.push_back(explosion);
+																			Explosion* explosion = new Explosion();
+																			explosion->initialize(this, explosion->getWidth(), explosion->getHeight(), explosionNS::TEXTURE_COLS, &explosionTexture);
+																			explosion->setX(temp_pickup->getX() + temp_pickup->getWidth() * temp_pickup->getScale() / 2 - (explosion->getWidth() / 2 * explosion->getScale()));
+																			explosion->setY(temp_pickup->getY() + temp_pickup->getHeight() * temp_pickup->getScale() / 2 - (explosion->getHeight() / 2 * explosion->getScale()));
+																			explosion->setFrameDelay(explosionNS::ANIMATION_DELAY);
+																			explosion->setCollisionRadius(explosionNS::WIDTH / 2.0f);
+																			tempVector.push_back(explosion);
 
-																											 // play sound async to the game to avoid 'lag'
-																											 PlaySound(PICKUP_EXPLODE_SOUND, NULL, SND_ASYNC);
-																											 printf("Pickup EXPLODES!\n");
+																			// play sound async to the game to avoid 'lag'
+																			audio->playCue(PICKUP_EXPLODE_SOUND);
+																			printf("Pickup EXPLODES!\n");
 																	   } break;
 																	   case PICKUP_DESTRUCTOR_FREEZE: {
-																										  Freeze* freeze = new Freeze();
-																										  freeze->initialize(this, freezeNS::WIDTH, freezeNS::HEIGHT, freezeNS::TEXTURE_COLS, &freezeTexture);
-																										  freeze->setFrames(freezeNS::START_FRAME, freezeNS::END_FRAME);
-																										  freeze->setCurrentFrame(freezeNS::START_FRAME);
-																										  freeze->setX(GAME_WIDTH / 2 - freezeNS::WIDTH / 2 * freezeNS::SCALING);
-																										  freeze->setY(GAME_HEIGHT / 2 - freezeNS::WIDTH / 2 * freezeNS::SCALING);
-																										  freeze->setFrameDelay(freezeNS::ANIMATION_DELAY);
-																										  freeze->setRect();
-																										  tempVector.push_back(freeze);
-																										  player->getEffectTimers()->at(EFFECT_FROZEN) = FREEZE_DURATION;
+																			audio->playCue(PLAYER_PICKUP_SOUND);
+																			Freeze* freeze = new Freeze();
+																			freeze->initialize(this, freezeNS::WIDTH, freezeNS::HEIGHT, freezeNS::TEXTURE_COLS, &freezeTexture);
+																			freeze->setFrames(freezeNS::START_FRAME, freezeNS::END_FRAME);
+																			freeze->setCurrentFrame(freezeNS::START_FRAME);
+																			freeze->setX(GAME_WIDTH / 2 - freezeNS::WIDTH / 2 * freezeNS::SCALING);
+																			freeze->setY(GAME_HEIGHT / 2 - freezeNS::WIDTH / 2 * freezeNS::SCALING);
+																			freeze->setFrameDelay(freezeNS::ANIMATION_DELAY);
+																			freeze->setRect();
+																			tempVector.push_back(freeze);
+																			player->getEffectTimers()->at(EFFECT_FROZEN) = FREEZE_DURATION;
 																	   } break;
 																	   case PICKUP_DESTRUCTOR_INVINCIBILITY: {
-																												 player->getEffectTimers()->at(EFFECT_INVINCIBLE) = INVIN_DURATION;
+																		   audio->playCue(PLAYER_PICKUP_SOUND);
+																		   player->getEffectTimers()->at(EFFECT_INVINCIBLE) = INVIN_DURATION;
 																	   } break;
 																	   case PICKUP_DESTRUCTOR_MISSLES: {
-																										   // get the enemies to target first
-																										   // discarded after this iteration
-																										   std::vector<Entity*> tempVect;
-																										   for (std::vector<Entity*>::iterator iter_ = entities.begin(); iter_ != entities.end(); ++iter_) {
-																											   if (
-																												   ((*iter_)->getObjectType() == OBJECT_TYPE_CIRCLE ||
-																												   (*iter_)->getObjectType() == OBJECT_TYPE_TRIANGLE ||
-																												   (*iter_)->getObjectType() == OBJECT_TYPE_BOSS) &&
-																												   (*iter_)->getActive() == true
-																												   ) {
-																												   tempVect.push_back(*iter_);
-																											   }
-																										   }
+																			// get the enemies to target first
+																			// discarded after this iteration
+																			std::vector<Entity*> tempVect;
+																			for (std::vector<Entity*>::iterator iter_ = entities.begin(); iter_ != entities.end(); ++iter_) {
+																				if (
+																					((*iter_)->getObjectType() == OBJECT_TYPE_CIRCLE ||
+																					(*iter_)->getObjectType() == OBJECT_TYPE_TRIANGLE ||
+																					(*iter_)->getObjectType() == OBJECT_TYPE_BOSS) &&
+																					(*iter_)->getActive() == true
+																					) {
+																					tempVect.push_back(*iter_);
+																				}
+																			}
 
-																										   // spawn 5 - 10 missiles
-																										   for (int i = 0; i <= minMaxRand(5, 10) && i < tempVect.size(); i++) {
-																											   Missile* m = new Missile();
-																											   m->initialize(this, 128, 32, 1, &missileTexture);
-																											   m->setX(player->getX() + m->getWidth() / 2);
-																											   m->setY(player->getY() + m->getHeight() / 2);
-																											   m->setTarget(tempVect[i]);
-																											   missiles.push_back(m);
-																										   }
+																			// spawn 5 - 10 missiles
+																			for (int i = 0; i <= minMaxRand(5, 10) && i < tempVect.size(); i++) {
+																				Missile* m = new Missile();
+																				m->initialize(this, 128, 32, 1, &missileTexture);
+																				m->setX(player->getX() + m->getWidth() / 2);
+																				m->setY(player->getY() + m->getHeight() / 2);
+																				m->setTarget(tempVect[i]);
+																				missiles.push_back(m);
+																			}
+
+																			audio->playCue(PLAYER_PICKUP_SOUND);
 																	   } break;
 																	   case PICKUP_HEALTH: {
 																		   // no need to reset heart type since there will always be one in a game
 																		   //audio->playCue(PLAYER_PICKUP_HEART_SOUND, NULL, SND_ASYNC);
 																		   printf("Health");
 																		   // create a new heart pickup
-																		   PlaySound(PLAYER_PICKUP_SOUND, NULL, SND_ASYNC);
+																		   audio->playCue(PLAYER_PICKUP_SOUND);
 																		   healthPickup = new Pickup();
 																		   healthPickup->initialize(this, PickupNS::WIDTH, PickupNS::HEIGHT, PickupNS::TEXTURE_COLS, &heartTexture);
 																		   healthPickup->setPickUpType(PICKUP_HEART);
@@ -956,7 +958,7 @@ void Spacewar::collisions() {
 																	   } break;
 																	   case PICKUP_HEART: {
 																		   printf("Heart");
-																		   PlaySound(PLAYER_PICKUP_HEART_SOUND, NULL, SND_ASYNC);
+																		   audio->playCue(PLAYER_PICKUP_HEART_SOUND);
 
 																		   // increase player health by 1
 																		   player->setHealth(player->getHealth() + 1);
@@ -976,25 +978,30 @@ void Spacewar::collisions() {
 																											 blackhole->setY(minMaxRand(blackhole->getWidth(), GAME_WIDTH - 2 * blackhole->getWidth()));
 
 																											 tempVector.push_back(blackhole);
+																											 audio->playCue(PLAYER_PICKUP_SOUND);
 																	   } break;
 																	   case PICKUP_OBSTRUCTOR_ENLARGE_PLAYER: {
-																												  player->getEffectTimers()->at(EFFECT_ENLARGED) = ENLARGE_DURATION;
+																			player->getEffectTimers()->at(EFFECT_ENLARGED) = ENLARGE_DURATION;
+																			audio->playCue(PLAYER_PICKUP_SOUND);
 																	   } break;
 																	   case PICKUP_OBSTRUCTOR_INVERT_CONTROLS: {
-																												   player->getEffectTimers()->at(EFFECT_INVERTED) = INVERTED_DURATION;
+																			player->getEffectTimers()->at(EFFECT_INVERTED) = INVERTED_DURATION;
+																			audio->playCue(PLAYER_PICKUP_SOUND);
 																	   } break;
 																	   case PICKUP_OBSTRUCTOR_SLOW_PLAYER: {
-																											   player->getEffectTimers()->at(EFFECT_SLOW) = SLOW_DURATION;
+																			player->getEffectTimers()->at(EFFECT_SLOW) = SLOW_DURATION;
+																			audio->playCue(PLAYER_PICKUP_SOUND);
 																	   } break;
 																	   case PICKUP_OBSTRUCTOR_STUN_PLAYER: {
-																											   player->getEffectTimers()->at(EFFECT_STUN) = STUN_DURATION;
+																			player->getEffectTimers()->at(EFFECT_STUN) = STUN_DURATION;audio->playCue(PLAYER_PICKUP_SOUND);
+																			audio->playCue(PLAYER_PICKUP_SOUND);
 																	   } break;
 																	   }
 
 																	   if (temp_pickup->getPickupType() != PICKUP_HEART)
 																		   temp_pickup->respawnPickup();
 																	   // pickup cooldown
-																	   //player->getEffectTimers()->at(EFFECT_CANNOT_PICKUP) = PICKUP_DURATION;
+																	   player->getEffectTimers()->at(EFFECT_CANNOT_PICKUP) = PICKUP_DURATION;
 																   }
 									  } break;
 									  }
