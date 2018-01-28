@@ -42,7 +42,7 @@ void Pickup::draw(){
 }
 
 void Pickup::update(float deltaTime){
-
+	Entity::update(deltaTime);
 }
 
 /*
@@ -50,16 +50,42 @@ void Pickup::update(float deltaTime){
  */
 void Pickup::spawn(){
 
-	if (this->getPickupType() != PICKUP_HEALTH)
-		calculateObstructorDestructorType();
+	setFrames(startFrame, endFrame);
+	setCollisionRadius(getHeight() / 2);
+	setVelocity(0, 0);						// powerups don't move;
+	setObjectType(OBJECT_TYPE_PICKUP);
+	setScale(0.2f);
 
-	// generate a random value for x and y
-	int randX = (rand() % ((GAME_WIDTH - 2 * this->getWidth()) - this->getWidth() + 1) + this->getWidth());
-	int randY = (rand() % ((GAME_HEIGHT - 2 * this->getHeight()) - this->getHeight() + 1) + this->getHeight());
+	//spawn randomly in window
+	int side = rand() % 4;
 
-	// spawn randomly in window
-	this->setX(randX);
-	this->setY(randY);
+	switch (side) {
+		// left
+	case 0: {
+		this->setX(0 - rand() % GAME_WIDTH);
+		this->setY(rand() % GAME_HEIGHT);
+	} break;
+		// top
+	case 1: {
+		this->setX(rand() % GAME_WIDTH);
+		this->setY(-(rand() % GAME_HEIGHT));
+	} break;
+		// right
+	case 2: {
+		this->setX(GAME_WIDTH + GAME_WIDTH - rand() % GAME_WIDTH);
+		this->setY(rand() % GAME_HEIGHT);
+	} break;
+		// bottom
+	case 3: {
+		this->setX(rand() % GAME_WIDTH);
+		this->setY(GAME_HEIGHT + GAME_HEIGHT - rand() % GAME_HEIGHT);
+	} break;
+	}
+
+	this->setX(rand() % GAME_WIDTH);
+	this->setY(rand() % GAME_HEIGHT);
+
+	this->setScale(0.5);
 }
 
 /*
@@ -68,8 +94,8 @@ void Pickup::spawn(){
 void Pickup::damage(WEAPON weapon){
 	switch (weapon)
 	{
-	case OBJECT_TYPE_PLAYER: {
-								 // this->setHealth(0);
+	case WEAPON_PLAYER: {
+								 this->setHealth(0);
 	}	break;
 	}
 }
@@ -135,13 +161,16 @@ void Pickup::calculateObstructorDestructorType(){
 		PICKUP_DESTRUCTOR_FREEZE,
 
 		PICKUP_DESTRUCTOR_INVINCIBILITY,
-		PICKUP_DESTRUCTOR_INVINCIBILITY
+		PICKUP_DESTRUCTOR_INVINCIBILITY,
+
+		PICKUP_HEALTH,
+		PICKUP_HEALTH
 	};
 
 	//	Array containing types of Destructor
 
 	if (isDestructor) {
-		randNumber = rand() % 10; //Get a number from 0 - 9
+		randNumber = rand() % 12; //Get a number from 0 - 11
 		type = destructorArray[randNumber];
 	}
 	else // is an obstructor
@@ -154,4 +183,20 @@ void Pickup::calculateObstructorDestructorType(){
 		this->setCurrentFrame(0);
 	else
 		this->setCurrentFrame(1);
+}
+
+void Pickup::setNewLocation()
+{
+	setX(minMaxRand_Pickup(getWidth(), GAME_WIDTH - 2 * getWidth()));
+	setY(minMaxRand_Pickup(getHeight(), GAME_HEIGHT - 2 * getHeight()));
+}
+
+int Pickup::minMaxRand_Pickup(int min, int max) {
+	return rand() % (max - min + 1) + min;
+}
+
+void Pickup::respawnPickup()
+{
+	calculateObstructorDestructorType();
+	setNewLocation();
 }

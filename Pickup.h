@@ -38,7 +38,8 @@ enum PickupType{
 	PICKUP_DESTRUCTOR_FREEZE,
 	PICKUP_DESTRUCTOR_INVINCIBILITY,
 
-	PICKUP_HEALTH
+	PICKUP_HEALTH,
+	PICKUP_HEART
 };
 
 class Pickup : public Entity{
@@ -51,21 +52,22 @@ public:
 	void spawn();
 	void damage(WEAPON);
 
-	// SET Methods
+
+	// GET and SET Methods
 	void setPickUpType(PickupType pickupType);
 	void setPickUpType();
-	
-	// GET Methods
+
 	PickupType getPickupType() { return this->type; }			// returns the type of pickup (i.e. blackhole, health, stun, freeze)
 	bool getIsDestructor() { return this->isDestructor; }		// returns true for destructor, false for obstructor
+	void calculateObstructorDestructorType();					// calculate the type of pickup
+	void setNewLocation();										// set new x and y location to Pickup
+	void respawnPickup();										// respawn pickup after it is collected
+	int minMaxRand_Pickup(int min, int max);					// generate a random integer based on minimum/maximum value
 
 private:
 
 	PickupType type;
 	boolean		isDestructor;
-
-protected:
-	void calculateObstructorDestructorType();					// calculate the type of pickup
 };
 
 #endif

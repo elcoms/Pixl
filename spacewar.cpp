@@ -183,20 +183,25 @@ void Spacewar::update() {
 								  this->addEntity(player);
 
 								  // Health Pickup
-								  healthPickup = new Pickup();
+								  /*healthPickup = new Pickup();
 								  healthPickup->initialize(this, PickupNS::WIDTH, PickupNS::HEIGHT, PickupNS::TEXTURE_COLS, &heartTexture);
 								  healthPickup->setPickUpType(PICKUP_HEALTH);
 								  healthPickup->setCurrentFrame(0);
 								  healthPickup->setX(minMaxRand(healthPickup->getWidth(), GAME_WIDTH - 2 * healthPickup->getWidth()));
 								  healthPickup->setY(minMaxRand(healthPickup->getHeight(), GAME_HEIGHT - 2 * healthPickup->getHeight()));
 
-								  addEntity(healthPickup);
+								  addEntity(healthPickup);*/
 
 								  // Other Pickups (Obstructor/Destructors)
 								  for (int i = 0; i < 3; i++) {
 									  Pickup* pickup = new Pickup();
 									  pickup->initialize(this, PickupNS::WIDTH, PickupNS::HEIGHT, PickupNS::TEXTURE_COLS, &destructorObstructorTexture);
-									  pickup->spawn();
+									  pickup->calculateObstructorDestructorType();
+									  if (pickup->getIsDestructor())
+										  pickup->setCurrentFrame(0);
+									  else
+										  pickup->setCurrentFrame(1);
+									  pickup->setNewLocation();
 
 									  addEntity(pickup);
 								  }
@@ -934,14 +939,33 @@ void Spacewar::collisions() {
 																										   }
 																	   } break;
 																	   case PICKUP_HEALTH: {
-																							   // no need to reset heart type since there will always be one in a game
-																							   PlaySound(PLAYER_PICKUP_HEART_SOUND, NULL, SND_ASYNC);
-																							   printf("I play the HEART sound\n");
+																		   // no need to reset heart type since there will always be one in a game
+																		   //audio->playCue(PLAYER_PICKUP_HEART_SOUND, NULL, SND_ASYNC);
+																		   printf("Health");
+																		   // create a new heart pickup
+																		   PlaySound(PLAYER_PICKUP_SOUND, NULL, SND_ASYNC);
+																		   healthPickup = new Pickup();
+																		   healthPickup->initialize(this, PickupNS::WIDTH, PickupNS::HEIGHT, PickupNS::TEXTURE_COLS, &heartTexture);
+																		   healthPickup->setPickUpType(PICKUP_HEART);
+																		   healthPickup->setCurrentFrame(0);
+																		   healthPickup->setX(minMaxRand(healthPickup->getWidth(), GAME_WIDTH - 2 * healthPickup->getWidth()));
+																		   healthPickup->setY(minMaxRand(healthPickup->getHeight(), GAME_HEIGHT - 2 * healthPickup->getHeight()));
 
-																							   player->setHealth(player->getHealth() + 1);
-																							   if (player->getHealth() > 10)
-																								   player->setHealth(10);
-																							   playerScore += genScore(++combo);
+																		   tempVector.push_back(healthPickup);
+																		   temp_pickup->respawnPickup();
+																	   } break;
+																	   case PICKUP_HEART: {
+																		   printf("Heart");
+																		   PlaySound(PLAYER_PICKUP_HEART_SOUND, NULL, SND_ASYNC);
+
+																		   // increase player health by 1
+																		   player->setHealth(player->getHealth() + 1);
+																		   if (player->getHealth() > 10)
+																			   player->setHealth(10);
+																		   //playerScore += genScore(++combo);
+
+																		   temp_pickup->damage(WEAPON_PLAYER);
+
 																	   } break;
 																	   case PICKUP_OBSTRUCTOR_BLACKHOLE: {
 																											 // blackhole is a environmental effect.
@@ -967,11 +991,10 @@ void Spacewar::collisions() {
 																	   } break;
 																	   }
 
-																	   // spawn a new pickup and set pickup cooldown
-																	   if (temp_pickup->getPickupType() != PICKUP_HEALTH && temp_pickup->getPickupType() != PICKUP_DESTRUCTOR_EXPLOSION)
-																		   PlaySound(PLAYER_PICKUP_SOUND, NULL, SND_ASYNC);
-																	   temp_pickup->spawn();
-																	   player->getEffectTimers()->at(EFFECT_CANNOT_PICKUP) = PICKUP_DURATION;
+																	   if (temp_pickup->getPickupType() != PICKUP_HEART)
+																		   temp_pickup->respawnPickup();
+																	   // pickup cooldown
+																	   //player->getEffectTimers()->at(EFFECT_CANNOT_PICKUP) = PICKUP_DURATION;
 																   }
 									  } break;
 									  }
