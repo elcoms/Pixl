@@ -12,6 +12,7 @@
 
 // declare circle namespace
 namespace CircleNS {
+	const float		ACCELERATION = 1.0f;
 	const float		MASS = 300.0f;
 	const float		SCALING = 0.2f;
 	const float		SPEED = 100;
@@ -28,13 +29,21 @@ namespace CircleNS {
 class Circle : public Entity {
 public:
 
-	Circle();
+	bool isFrozen;
+	float velo_x, velo_y;
+	float acceleration;
 
+	Circle();
+	float getAcceleration(){ return this->acceleration; };
+	void setAcceleration(float acc) { this->acceleration = acc; };
+	
 	virtual void draw();
 	virtual bool initialize(Game *gamePtr, int width, int height, int ncols, TextureManager *textureM);
 	void update(float deltaTime);
 	void spawn();
 	void damage(WEAPON);
+	void freeze();
+	void unfreeze();
 };
 
 #endif

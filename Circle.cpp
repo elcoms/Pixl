@@ -16,8 +16,10 @@ Circle::Circle() : Entity(){
 	spriteData.rect.bottom = CircleNS::HEIGHT;
 	spriteData.rect.right = CircleNS::WIDTH;
 	spriteData.scale = CircleNS::SCALING;
+	acceleration = CircleNS::ACCELERATION;
 	velocity.x = 0;
 	velocity.y = 0;
+	isFrozen = false;
 	startFrame = CircleNS::CIRCLE_START_FRAME;
 	endFrame = CircleNS::CIRCLE_END_FRAME;
 	currentFrame = startFrame;
@@ -41,8 +43,8 @@ void Circle::draw(){
 void Circle::update(float deltaTime){
 	Entity::update(deltaTime);
 	spriteData.angle += deltaTime * CircleNS::ROTATION_RATE;  // rotate the ship
-	spriteData.x += deltaTime * velocity.x;         // move ship along X 
-	spriteData.y += deltaTime * velocity.y;         // move ship along Y
+	spriteData.x += deltaTime * velocity.x * acceleration;         // move ship along X 
+	spriteData.y += deltaTime * velocity.y * acceleration;         // move ship along Y
 
 	// Bounce off walls
 	if (spriteData.x > GAME_WIDTH - CircleNS::WIDTH * this->getScale())    // if hit right screen edge
@@ -123,4 +125,31 @@ void Circle::damage(WEAPON weapon){
 
 	if (this->getHealth() < 0)
 		this->setHealth(0);
+}
+
+void Circle::freeze()
+{
+	// Only save before circle is frozen
+	// else it will be overriding the variables used to store the old velocity
+	if (!isFrozen)
+	{
+		velo_x = velocity.x;
+		velo_y = velocity.y;
+		
+		isFrozen = true;
+		setVelocity(0, 0);
+	}
+}
+
+// unfreeze a circle
+void Circle::unfreeze()
+{
+	if (isFrozen)
+	{
+		velocity.x = velo_x;
+		velocity.y = velo_y;
+		isFrozen = false;
+
+		setVelocity(velocity.x, velocity.y);
+	}
 }

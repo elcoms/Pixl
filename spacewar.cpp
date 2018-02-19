@@ -248,6 +248,7 @@ void Spacewar::update() {
 
 							  // check if the current wave is over; spawns new stuff if true
 							  if (isWaveOver(entities)) {
+								  waveBufferTime = 1.5f;
 								  currentWave++;
 								  for (int i = 0; i < TRIANGLE_COUNT(currentWave); i++) {
 									  Triangle* tri = new Triangle();
@@ -682,6 +683,20 @@ void Spacewar::UpdateEntities() {
 									   if (player->hasEffect(EFFECT_FROZEN)) {
 										   (*iter)->setVelocity(0, 0);
 									   }
+		} break;
+		case OBJECT_TYPE_CIRCLE: {
+
+			Circle* c = (Circle*)*iter;
+			if (!player->hasEffect(EFFECT_FROZEN))
+			{
+				c->unfreeze();	
+
+				if (timeGetTime() % 1000 == 0)
+					c->setAcceleration(c->getAcceleration() + 0.1f);
+			}
+			else {
+				c->freeze();
+			}
 		} break;
 		case OBJECT_TYPE_MISSILE: {		// Empty
 		} break;
