@@ -10,6 +10,7 @@
  * child of Entity Class
  */
 Pickup::Pickup() : Entity(){
+	acceleration = PickupNS::ACCELERATION;
 	spriteData.width = PickupNS::WIDTH;
 	spriteData.height = PickupNS::HEIGHT;
 	spriteData.rect.bottom = PickupNS::HEIGHT;
@@ -43,6 +44,31 @@ void Pickup::draw(){
 
 void Pickup::update(float deltaTime){
 	Entity::update(deltaTime);
+	spriteData.angle += deltaTime * PickupNS::ROTATION_RATE;  // rotate the ship
+	spriteData.x += deltaTime * velocity.x * acceleration;         // move ship along X 
+	spriteData.y += deltaTime * velocity.y * acceleration;         // move ship along Y
+
+	// Bounce off walls
+	if (spriteData.x > GAME_WIDTH - PickupNS::WIDTH * this->getScale())    // if hit right screen edge
+	{
+		spriteData.x = GAME_WIDTH - PickupNS::WIDTH * this->getScale();    // position at right screen edge
+		velocity.x = -velocity.x;                   // reverse X direction
+	}
+	else if (spriteData.x < 0)                    // else if hit left screen edge
+	{
+		spriteData.x = 0;                           // position at left screen edge
+		velocity.x = -velocity.x;                   // reverse X direction
+	}
+	if (spriteData.y > GAME_HEIGHT - PickupNS::HEIGHT * this->getScale())  // if hit bottom screen edge
+	{
+		spriteData.y = GAME_HEIGHT - PickupNS::HEIGHT * this->getScale();  // position at bottom screen edge
+		velocity.y = -velocity.y;                   // reverse Y direction
+	}
+	else if (spriteData.y < 0)                    // else if hit top screen edge
+	{
+		spriteData.y = 0;                           // position at top screen edge
+		velocity.y = -velocity.y;                   // reverse Y direction
+	}
 }
 
 /*
@@ -52,9 +78,8 @@ void Pickup::spawn(){
 
 	setFrames(startFrame, endFrame);
 	setCollisionRadius(getHeight() / 2);
-	setVelocity(0, 0);						// powerups don't move;
+	setVelocity(rand() % 1000, rand() % 1000);
 	setObjectType(OBJECT_TYPE_PICKUP);
-	setScale(0.2f);
 
 	//spawn randomly in window
 	int side = rand() % 4;
@@ -84,8 +109,6 @@ void Pickup::spawn(){
 
 	this->setX(rand() % GAME_WIDTH);
 	this->setY(rand() % GAME_HEIGHT);
-
-	this->setScale(0.5);
 }
 
 /*
@@ -185,12 +208,6 @@ void Pickup::calculateObstructorDestructorType(){
 		this->setCurrentFrame(1);
 }
 
-void Pickup::setNewLocation()
-{
-	setX(minMaxRand_Pickup(getWidth(), GAME_WIDTH - 2 * getWidth()));
-	setY(minMaxRand_Pickup(getHeight(), GAME_HEIGHT - 2 * getHeight()));
-}
-
 int Pickup::minMaxRand_Pickup(int min, int max) {
 	return rand() % (max - min + 1) + min;
 }
@@ -198,5 +215,5 @@ int Pickup::minMaxRand_Pickup(int min, int max) {
 void Pickup::respawnPickup()
 {
 	calculateObstructorDestructorType();
-	setNewLocation();
+	spawn();
 }

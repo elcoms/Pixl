@@ -55,7 +55,7 @@ const float MASS_PLANET = 1.0e14f;
 const float MASS_SHIP = 5.0f;
 
 // player
-const int PLAYER_HEALTH					= 1;						// player starting health
+const int PLAYER_HEALTH					= 3;						// player starting health
 const int PLAYER_MAX_HEALTH				= 10;						// player maximum health
 const int PLAYER_START_FRAME			= 0;						// player starts at frame 0
 const int PLAYER_END_FRAME				= 3;						// player animation frames 0,1,2,3

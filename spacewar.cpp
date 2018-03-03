@@ -197,7 +197,7 @@ void Spacewar::update() {
 										  pickup->setCurrentFrame(0);
 									  else
 										  pickup->setCurrentFrame(1);
-									  pickup->setNewLocation();
+									  pickup->spawn();
 
 									  addEntity(pickup);
 								  }
@@ -697,7 +697,7 @@ void Spacewar::UpdateEntities() {
 			else {
 				c->freeze();
 			}
-		} break;
+		} break; 
 		case OBJECT_TYPE_MISSILE: {		// Empty
 		} break;
 		case OBJECT_TYPE_BLACKHOLE: {
@@ -965,11 +965,9 @@ void Spacewar::collisions() {
 																		   healthPickup->initialize(this, PickupNS::WIDTH, PickupNS::HEIGHT, PickupNS::TEXTURE_COLS, &heartTexture);
 																		   healthPickup->setPickUpType(PICKUP_HEART);
 																		   healthPickup->setCurrentFrame(0);
-																		   healthPickup->setX(minMaxRand(healthPickup->getWidth(), GAME_WIDTH - 2 * healthPickup->getWidth()));
-																		   healthPickup->setY(minMaxRand(healthPickup->getHeight(), GAME_HEIGHT - 2 * healthPickup->getHeight()));
+																		   healthPickup->spawn();
 
 																		   tempVector.push_back(healthPickup);
-																		   temp_pickup->respawnPickup();
 																	   } break;
 																	   case PICKUP_HEART: {
 																		   printf("Heart");

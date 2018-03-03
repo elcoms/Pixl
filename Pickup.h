@@ -11,6 +11,7 @@
 #include "constants.h"
 
 namespace PickupNS {
+	const float		ACCELERATION = 0.1f;
 	const float		MASS = 0.0f;
 	const float		SCALING = 0.4f;
 	const float		SPEED = 0;
@@ -60,14 +61,14 @@ public:
 	PickupType getPickupType() { return this->type; }			// returns the type of pickup (i.e. blackhole, health, stun, freeze)
 	bool getIsDestructor() { return this->isDestructor; }		// returns true for destructor, false for obstructor
 	void calculateObstructorDestructorType();					// calculate the type of pickup
-	void setNewLocation();										// set new x and y location to Pickup
 	void respawnPickup();										// respawn pickup after it is collected
 	int minMaxRand_Pickup(int min, int max);					// generate a random integer based on minimum/maximum value
 
 private:
 
-	PickupType type;
+	PickupType	type;
 	boolean		isDestructor;
+	float		acceleration;
 };
 
 #endif
