@@ -12,6 +12,7 @@
 
 namespace PickupNS {
 	const float		ACCELERATION = 0.1f;
+	const float		HEART_TIME = 10.0f;
 	const float		MASS = 0.0f;
 	const float		SCALING = 0.4f;
 	const float		SPEED = 0;
@@ -55,8 +56,12 @@ public:
 
 
 	// GET and SET Methods
+	float getHeartTimeLimit() { return this->heartTimeLimit; }
+
+	void setHeartTimeLimit(float h) { this->heartTimeLimit = h; }
 	void setPickUpType(PickupType pickupType);
 	void setPickUpType();
+	
 
 	PickupType getPickupType() { return this->type; }			// returns the type of pickup (i.e. blackhole, health, stun, freeze)
 	bool getIsDestructor() { return this->isDestructor; }		// returns true for destructor, false for obstructor
@@ -69,6 +74,7 @@ private:
 	PickupType	type;
 	boolean		isDestructor;
 	float		acceleration;
+	float		heartTimeLimit;									// amount of time before heart disappears
 };
 
 #endif

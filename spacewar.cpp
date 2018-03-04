@@ -441,10 +441,10 @@ void Spacewar::render() {
 
 									  ss.str("SCORE");																					// score label
 									  scoreFont->Print(10, 30, ss.str());
-									  ss.str(": " + std::to_string(playerScore));																	// player score
+									  ss.str(": " + std::to_string(playerScore));														// player score
 									  scoreFont->Print(10 + scoreFont->getTotalWidth("HIGHSCORE"), 30, ss.str());
 
-									  ss.str("HIGHSCORE: " + std::to_string(highscore));													// latest highscore
+									  ss.str("HIGHSCORE: " + std::to_string(highscore));												// latest highscore
 									  scoreFont->Print(10, 0, ss.str());
 									  
 									  for (std::vector<Entity*>::iterator iter = hearts.begin(); iter != hearts.end(); ++iter) {
@@ -635,7 +635,7 @@ void Spacewar::UpdateEntities() {
 										 }
 									 }
 
-		} break;
+		}	break;
 		case OBJECT_TYPE_TRIANGLE: {
 									   Triangle* t = (Triangle*) *iter;
 									   double dx, dy;			// For tracking the player
@@ -683,7 +683,7 @@ void Spacewar::UpdateEntities() {
 									   if (player->hasEffect(EFFECT_FROZEN)) {
 										   (*iter)->setVelocity(0, 0);
 									   }
-		} break;
+		}	break;
 		case OBJECT_TYPE_CIRCLE: {
 
 			Circle* c = (Circle*)*iter;
@@ -697,12 +697,25 @@ void Spacewar::UpdateEntities() {
 			else {
 				c->freeze();
 			}
-		} break; 
+		}	break; 
 		case OBJECT_TYPE_MISSILE: {		// Empty
-		} break;
+		}	break;
 		case OBJECT_TYPE_BLACKHOLE: {
-										calculateF(*iter, player);			// calculates force between player and blackhole
-		} break;
+			calculateF(*iter, player);			// calculates force between player and blackhole
+		}	break;
+		case OBJECT_TYPE_PICKUP: {
+			
+			Pickup* p = (Pickup*)*iter;
+
+			float htl = p->getHeartTimeLimit();
+			if (htl > 0) {
+				p->setHeartTimeLimit(htl - deltaTime);
+			}
+			else if (p->getPickupType() == PickupType::PICKUP_HEART)
+			{
+				p->damage(WEAPON_PLAYER);
+			}
+		}	break;
 		}
 		(*iter)->update(deltaTime);
 	}
@@ -964,6 +977,7 @@ void Spacewar::collisions() {
 																		   healthPickup = new Pickup();
 																		   healthPickup->initialize(this, PickupNS::WIDTH, PickupNS::HEIGHT, PickupNS::TEXTURE_COLS, &heartTexture);
 																		   healthPickup->setPickUpType(PICKUP_HEART);
+																		   healthPickup->setHeartTimeLimit(PickupNS::HEART_TIME);
 																		   healthPickup->setCurrentFrame(0);
 																		   healthPickup->spawn();
 
@@ -1006,7 +1020,7 @@ void Spacewar::collisions() {
 																			audio->playCue(PLAYER_PICKUP_SOUND);
 																	   } break;
 																	   case PICKUP_OBSTRUCTOR_STUN_PLAYER: {
-																			player->getEffectTimers()->at(EFFECT_STUN) = STUN_DURATION;audio->playCue(PLAYER_PICKUP_SOUND);
+																			player->getEffectTimers()->at(EFFECT_STUN) = STUN_DURATION;
 																			audio->playCue(PLAYER_PICKUP_SOUND);
 																	   } break;
 																	   }
