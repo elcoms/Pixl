@@ -121,6 +121,9 @@ void Circle::damage(WEAPON weapon){
 	case WEAPON_PLAYER: {
 							this->setHealth(0);
 	} break;
+	case WEAPON_BLACKHOLE: {
+		this->setHealth(0);
+	} break;
 	}
 
 	if (this->getHealth() < 0)

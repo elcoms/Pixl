@@ -23,6 +23,7 @@ Triangle::Triangle() : Entity() {
 	mass = TriangleNS::MASS;
 	collisionType = entityNS::CIRCLE;
 	acceleration = TriangleNS::ACCELERATION;
+	blackholeEffect = false;
 }
 
 bool Triangle::initialize(Game *gamePtr, int width, int height, int ncols, TextureManager *textureM) {
@@ -99,13 +100,16 @@ void Triangle::spawn() {
 void Triangle::damage(WEAPON weapon) {
 	switch (weapon) {
 	case WEAPON_MISSILE: {
-							 this->setHealth(0);
+		this->setHealth(0);
 	} break;
 	case WEAPON_EXPLOSION: {
-							   this->setHealth(0);
+		this->setHealth(0);
 	} break;
 	case WEAPON_PLAYER: {
-							this->setHealth(0);
+		this->setHealth(0);
+	} break;
+	case WEAPON_BLACKHOLE: {
+		this->setHealth(0);
 	} break;
 	}
 
