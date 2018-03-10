@@ -341,6 +341,30 @@ void Spacewar::update() {
 										  }
 									  }
 								  }
+								  // blackhole collision detection
+								  else if ((*iter)->getObjectType() == OBJECT_TYPE_BLACKHOLE) {
+									  for (std::vector<Entity*>::iterator iter_ = entities.begin(); iter_ != entities.end(); iter_++) {
+										  if (((*iter_)->getObjectType() == OBJECT_TYPE_CIRCLE ||
+											  (*iter_)->getObjectType() == OBJECT_TYPE_TRIANGLE ||
+											  (*iter_)->getObjectType() == OBJECT_TYPE_BOSS) &&
+											  (*iter_)->getActive() == true) {
+											  if ((*iter_)->collidesWith(**iter, collisionVector)) {
+												  switch ((*iter_)->getObjectType()) {
+												  case OBJECT_TYPE_TRIANGLE: {
+													  Triangle* triangle = (Triangle*)(*iter_);
+													  triangle->damage(WEAPON_BLACKHOLE);
+												  } break;
+												  case OBJECT_TYPE_CIRCLE: {
+													  Circle* circle = (Circle*)(*iter_);
+													  circle->damage(WEAPON_BLACKHOLE);
+												  } break;
+												  case OBJECT_TYPE_BOSS: {
+												  } break;
+												  }
+											  }
+										  }
+									  }
+								  }
 							  }
 
 							  // update combo as the game progresses
@@ -650,33 +674,35 @@ void Spacewar::UpdateEntities() {
 											   t->setAcceleration(t->getAcceleration() + 0.1f);
 									   }
 
-									   if (player->hasEffect(EFFECT_INVINCIBLE))
-									   {
-										   // 2, 3 quad
-										   if (dx > 0)
-											   (*iter)->setRadians(PI + atan(dy / dx));
-										   // 1, 4 quad
-										   else if (dx < 0)
-											   (*iter)->setRadians(atan(dy / dx));
+									   if (!t->getBlackholeEffect()) {	//stop updating velocity if blackhole is affecting it
+										   if (player->hasEffect(EFFECT_INVINCIBLE))
+										   {
+											   // 2, 3 quad
+											   if (dx > 0)
+												   (*iter)->setRadians(PI + atan(dy / dx));
+											   // 1, 4 quad
+											   else if (dx < 0)
+												   (*iter)->setRadians(atan(dy / dx));
 
-										   (*iter)->setVelocity(
-											   cos((*iter)->getRadians()) * 50 / t->getAcceleration(),
-											   sin((*iter)->getRadians()) * 50 / t->getAcceleration()
-											   );
-									   }
-									   else
-									   {
-										   // 1, 4 quad
-										   if (dx > 0)
-											   (*iter)->setRadians(atan(dy / dx));
-										   // 2, 3 quad
-										   else if (dx < 0)
-											   (*iter)->setRadians(PI + atan(dy / dx));
+											   (*iter)->setVelocity(
+												   cos((*iter)->getRadians()) * 50 / t->getAcceleration(),
+												   sin((*iter)->getRadians()) * 50 / t->getAcceleration()
+												   );
+										   }
+										   else
+										   {
+											   // 1, 4 quad
+											   if (dx > 0)
+												   (*iter)->setRadians(atan(dy / dx));
+											   // 2, 3 quad
+											   else if (dx < 0)
+												   (*iter)->setRadians(PI + atan(dy / dx));
 
-										   (*iter)->setVelocity(
-											   cos((*iter)->getRadians()) * 50 * t->getAcceleration(),
-											   sin((*iter)->getRadians()) * 50 * t->getAcceleration()
-											   );
+											   (*iter)->setVelocity(
+												   cos((*iter)->getRadians()) * 50 * t->getAcceleration(),
+												   sin((*iter)->getRadians()) * 50 * t->getAcceleration()
+												   );
+										   }
 									   }
 
 									   // Freeze triangle if player has frozen effect
@@ -701,7 +727,14 @@ void Spacewar::UpdateEntities() {
 		case OBJECT_TYPE_MISSILE: {		// Empty
 		}	break;
 		case OBJECT_TYPE_BLACKHOLE: {
-			calculateF(*iter, player);			// calculates force between player and blackhole
+			// calculates force between player, enemies and blackhole
+			for (std::vector<Entity*>::iterator i = entities.begin(); i != entities.end(); ++i) {
+				if ((*i)->getObjectType() == OBJECT_TYPE_PLAYER ||
+					(*i)->getObjectType() == OBJECT_TYPE_TRIANGLE ||
+					(*i)->getObjectType() == OBJECT_TYPE_CIRCLE) {
+					calculateF(*iter, *i);
+				}
+			}
 		}	break;
 		case OBJECT_TYPE_PICKUP: {
 			
@@ -730,6 +763,13 @@ void Spacewar::KillEntities() {
 			// will be kept simple to prevent modifying the iterator while deleting an item
 			switch ((*iter)->getObjectType()) {
 			case OBJECT_TYPE_BLACKHOLE: {
+				for (std::vector<Entity*>::iterator i = entities.begin(); i != entities.end(); ++i) {
+					if ((*i)->getObjectType() == OBJECT_TYPE_TRIANGLE) {
+						Triangle* t = (Triangle*)(*i);
+
+						t->setBlackholeEffect(false);
+					}
+				}
 				(*iter)->setActive(false);
 				(*iter)->setVisible(false);
 				iter = entities.erase(iter);
@@ -1006,6 +1046,14 @@ void Spacewar::collisions() {
 
 																											 tempVector.push_back(blackhole);
 																											 audio->playCue(PLAYER_PICKUP_SOUND);
+
+																											 for (std::vector<Entity*>::iterator i = entities.begin(); i != entities.end(); ++i) {
+																												 if ((*i)->getObjectType() == OBJECT_TYPE_TRIANGLE) {
+																													 Triangle* t = (Triangle*)(*i);
+																													 
+																													 t->setBlackholeEffect(true);
+																												 }
+																											 }
 																	   } break;
 																	   case PICKUP_OBSTRUCTOR_ENLARGE_PLAYER: {
 																			player->getEffectTimers()->at(EFFECT_ENLARGED) = ENLARGE_DURATION;

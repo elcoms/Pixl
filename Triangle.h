@@ -29,11 +29,14 @@ class Triangle : public Entity {
 public:
 
 	float acceleration;
+	bool blackholeEffect;
 
 	Triangle();
 
 	float getAcceleration();
 	void setAcceleration(float acceleration);
+	bool getBlackholeEffect() { return blackholeEffect; }
+	void setBlackholeEffect(bool b) { blackholeEffect = b; }
 
 	virtual void draw();
 	virtual bool initialize(Game *gamePtr, int width, int height, int ncols, TextureManager *textureM);
